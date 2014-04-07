@@ -29,6 +29,7 @@ public class Board {
 	public Board(Board other){
 		this(other.width,other.height);
 		System.arraycopy(other.boardData, 0, boardData, 0, other.boardData.length);
+		freeSlots = other.freeSlots;
 	}
 	
 	/**
@@ -147,6 +148,27 @@ public class Board {
 				equal = boardData[i] == b.boardData[i];
 			}
 			return equal;
+		}
+	}
+	/**
+	 * Gets the value of the board, the lower value, the better board.
+	 * The value is calculated based on how all aligned tiles differ in value.
+	 * 0 difference between tiles adds 0 value. TODO write more
+	 */
+	public int getValue(){
+		return 0;
+	}
+	public boolean isGameOver(){
+		if(freeSlots != 0){
+			return false;
+		}else{
+			for(Direction d : Direction.values()){
+				Board b = this.move(d);
+				if(!this.equals(b)){
+					return false;
+				}
+			}
+			return true;
 		}
 	}
 }

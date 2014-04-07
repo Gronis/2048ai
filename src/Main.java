@@ -30,6 +30,12 @@ public class Main {
 			case "r":
 				b = b.move(Direction.RIGHT);
 				break;
+			case "simulate":
+				b = AI.simulate(b,true);
+				break;
+			case "restart":
+				b = new Board();
+				break;
 			}
 		}
 		
