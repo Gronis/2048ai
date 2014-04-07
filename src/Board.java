@@ -38,8 +38,8 @@ public class Board {
 	 */
 	public Board move(Direction d){
 		Board b = new Board(this);
+		boolean[] merged = new boolean[width*height];
 		for(int i = 0; i < boardData.length; i++){
-			boolean[] merged = new boolean[width*height];
 			b.move(merged,d,getX(i),getY(i));
 		}
 		if(!this.equals(b)){
@@ -58,6 +58,7 @@ public class Board {
 		//continue only if tile and tile ahead is within the board and that tile hasn't merged yet
 		if(isInsideBoard(x, y) && isInsideBoard(x2,y2) 
 				&& !merged[getIndex(x, y)] && !merged[getIndex(x2, y2)]){
+			move(merged,d,x2,y2);
 			int value = getValue(x, y), value2 = getValue(x2, y2);
 			if(value != EMPTY){
 				if(value2 == EMPTY){
@@ -106,7 +107,7 @@ public class Board {
 				current = r.nextInt(width * height); 
 			}
 			while(getValue(getX(current),getY(current)) != EMPTY);
-			int value = r.nextInt(10) == 0? 10 : 9;
+			int value = r.nextInt(10) == 0? 2 : 1;
 			setValue(getX(current), getY(current), value);
 			freeSlots--;
 		}
