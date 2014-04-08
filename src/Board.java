@@ -86,6 +86,9 @@ public class Board {
 	public int getValue(int x,int y){
 		return boardData[getIndex(x, y)];
 	}
+	public int getValue(int index){
+		return boardData[index];
+	}
 	public void setValue(int x, int y, int value){
 		boardData[getIndex(x, y)] = value;
 	}
@@ -133,6 +136,7 @@ public class Board {
 			sb.append("#\n");
 		}
 		sb.append("######\n");
+		sb.append("\nValue: " + getValue());
 		return sb.toString();
 	}
 	@Override
@@ -156,8 +160,70 @@ public class Board {
 	 * 0 difference between tiles adds 0 value. TODO write more
 	 */
 	public int getValue(){
-		return 0;
+		int totalValue = 0;
+		for(int i = 0; i < boardData.length; i++){
+			int valueCurrentTile = getValue(getX(i), getY(i));
+			if(valueCurrentTile != EMPTY) {
+				for(Direction d : Direction.values()){
+					int adjacentX = getX(i) + d.x, adjacentY = getY(i) + d.y;
+					int valueAdjacent = EMPTY;
+					boolean inside = isInsideBoard(adjacentX, adjacentY);
+					//find first piece that is adjacent to current tile
+					while(valueAdjacent == EMPTY && inside){
+						valueAdjacent = getValue(adjacentX, adjacentY);
+						adjacentX += d.x; adjacentY += d.y;
+						inside = isInsideBoard(adjacentX, adjacentY);
+					}
+					if(inside && valueAdjacent != EMPTY){
+						if(valueAdjacent == valueCurrentTile){
+							totalValue -= valueAdjacent * valueAdjacent * valueAdjacent * (freeSlots + 1);
+						}else{
+							int abs = Math.abs(valueCurrentTile - valueAdjacent);
+							totalValue += abs * (freeSlots + 1)
+									* Math.max(valueCurrentTile, valueAdjacent);
+						}
+					}
+				}
+			}
+		}
+		int highest = getHighest();
+		return totalValue - (isInCorner(getIndexHighest())? highest * highest * highest * highest * (freeSlots + 1) : highest * (freeSlots + 1));
 	}
+	public Board fill(int value){
+		Board b = new Board(this);
+		for(int i = 0; i < b.boardData.length; i++){
+			if(b.boardData[i] == EMPTY){
+				b.boardData[i] = value;
+			}
+		}
+		return b;
+	}
+	
+	public int getHighest(){
+		return getValue(getIndexHighest());
+	}
+	
+	public int getIndexHighest(){
+		int index = -1;
+		int highest = EMPTY;
+		for(int i = 0; i < boardData.length; i++){
+			if(boardData[i] > highest){
+				highest = boardData[i];
+				index = i;
+			}
+		}
+		return index;
+	}
+	
+	public boolean isInCorner(int index){
+		return isInCorner(getX(index), getY(index));
+	}
+	
+	public boolean isInCorner(int x, int y){
+		return (x == 0 && (y == 0 || y == height)) ||
+			   (y == 0 && (x == 0 || x == width));
+	}
+	
 	public boolean isGameOver(){
 		if(freeSlots != 0){
 			return false;

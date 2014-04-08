@@ -11,10 +11,27 @@ public class AI {
 	 * @return true if reached 2048 before game over. false otherwise
 	 */
 	public static Board simulate(Board b, boolean print){
-		Random r = new Random();
 		while(!b.isGameOver()){
-			Direction d = Direction.values()[r.nextInt(4)];
-			b = b.move(d);
+			b = simulateStep(b, print);
+		}
+		return b;
+	}
+	public static Board simulateStep(Board b, boolean print){
+		Board bestNewBoard = b.move(Direction.DOWN);
+		Direction bestDirection = Direction.DOWN;
+		for(Direction d : Direction.values()){
+			Board newBoard = b.move(d);
+			if(bestNewBoard.equals(b)){
+				bestNewBoard = newBoard;
+				bestDirection = d;
+			} else if(bestNewBoard.getValue() > newBoard.fill(1).getValue() &&
+					!newBoard.equals(b)){
+				bestNewBoard = newBoard.fill(1);
+				bestDirection = d;
+			}
+		}
+		b = b.move(bestDirection);
+		if(print){
 			System.out.println(b);
 		}
 		return b;
